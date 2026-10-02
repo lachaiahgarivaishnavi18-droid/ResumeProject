@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.env
+.venv/
+venv/
+.pytest_cache/
+
+# Node
+node_modules/
+.next/
+out/
+
+# OS
+.DS_Store
+
+# App data
+*.db
+*.sqlite3
+
+# Logs
+*.log
