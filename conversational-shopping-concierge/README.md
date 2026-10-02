@@ -57,7 +57,7 @@ flowchart TD
 1. Copy backend environment file:
    cp backend/.env.example backend/.env
 2. Install backend dependencies:
-   cd backend && python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+   cd backend && python3.12 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 3. Start backend:
    uvicorn app.main:app --reload
 4. Install frontend dependencies:

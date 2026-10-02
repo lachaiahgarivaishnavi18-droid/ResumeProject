@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+
 const products = [
   { id: 'LAP001', name: 'AeroPro G14', brand: 'AeroPro', price: 74999, stock: 'In stock', tag: 'Gaming / coding' },
   { id: 'MON001', name: 'VisionMax 27U', brand: 'VisionMax', price: 24999, stock: 'In stock', tag: '4K compatible' },
@@ -19,7 +21,7 @@ export default function Home() {
     setResult('Searching product catalog and checking available inventory...');
 
     try {
-      const response = await fetch('http://localhost:8000/api/chat', {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: 'session_001', user_id: 'user_001', message: query }),
