@@ -12,8 +12,12 @@ from app.graph.state import AgentState
 def parse_requirements(text: str) -> dict[str, Any]:
     lowered = text.lower()
     category = "laptop" if "laptop" in lowered else "monitor" if "monitor" in lowered else "smartphone" if "phone" in lowered else None
-    budget_match = re.search(r"(?:under|within|budget|max|upto|up to|below)\s*₹?\s?(\d{3,6})", text, re.IGNORECASE)
-    budget = float(budget_match.group(1)) if budget_match else None
+    budget_match = re.search(
+        r"(?:under|within|budget|max|upto|up to|below)\s*₹?\s?(\d{1,3}(?:,\d{3})+|\d{3,6})",
+        text,
+        re.IGNORECASE,
+    )
+    budget = float(budget_match.group(1).replace(",", "")) if budget_match else None
     use_cases = []
     if "gaming" in lowered:
         use_cases.append("gaming")
@@ -143,11 +147,19 @@ def validation_node(state: AgentState) -> AgentState:
 
 def response_node(state: AgentState) -> AgentState:
     recs = state.get("recommendations", [])
-    primary = recs[0] if recs else {}
+    if not recs:
+        state["final_response"] = (
+            "I couldn't find a product matching those requirements in the current catalog. "
+            "Try adjusting your budget or product category and I'll search again."
+        )
+        state["status"] = "completed"
+        return state
+
+    primary = recs[0]
     response = (
         f"I found the best match: {primary.get('name', 'Product')} at ₹{primary.get('price', 0)}. "
         f"It is {'currently in stock' if primary.get('available') else 'not confirmed in stock'} and "
-        f"{'compatible with the requested monitor' if primary.get('compatible') else 'compatibility needs verification'}."
+        f"{'meets the compatibility checks performed' if primary.get('compatible') else 'compatibility needs verification'}."
     )
     state["final_response"] = response
     state["status"] = "completed"
@@ -182,7 +194,11 @@ def build_workflow():
     workflow.add_edge("recommendation", "validation")
     workflow.add_conditional_edges(
         "validation",
-        lambda state: "response" if state["validation_result"]["decision"] == "PASS" else "product_search",
+        lambda state: (
+            "response"
+            if state["validation_result"]["decision"] == "PASS" or not state.get("product_candidates")
+            else "product_search"
+        ),
         {
             "response": "response",
             "product_search": "product_search",

@@ -1,6 +1,6 @@
 # Conversational Shopping Concierge
 
-A production-style multi-agent e-commerce assistant built with FastAPI, LangChain, LangGraph, Next.js, ChromaDB, PostgreSQL, Redis, and OpenAI.
+A full-stack shopping assistant with a Next.js storefront, a FastAPI product and chat API, and a LangGraph shopping workflow. The demo catalog is local, so browsing and product recommendations work without configuring an LLM API key.
 
 ## Overview
 
@@ -35,7 +35,9 @@ flowchart TD
 - Multi-agent orchestration with LangGraph
 - Specialized agents for requirements, search, inventory, compatibility, recommendation, action, validation, and response
 - RAG with ChromaDB and OpenAI embeddings
-- Structured product search and inventory checks
+- Product catalog with detail pages and inventory information
+- Conversational product search with requirement and inventory checks
+- Browser-persisted cart for reviewing selected products
 - Human approval workflow for purchase actions
 - Typed workflow state and safe routing
 - Dockerized deployment setup
@@ -54,29 +56,52 @@ flowchart TD
 
 ## Running locally
 
-1. Copy backend environment file:
-   cp backend/.env.example backend/.env
-2. Install backend dependencies:
-   cd backend && python3.12 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-3. Start backend:
-   uvicorn app.main:app --reload
-4. Install frontend dependencies:
-   cd frontend && npm install
-5. Start frontend:
-   npm run dev
-6. Optional Docker stack:
-   cd .. && docker compose up --build
+Start the backend from the project directory:
+
+```bash
+cd backend
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+In another terminal, start the frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). The frontend API routes proxy chat and catalog requests to `http://localhost:8000` by default. Set `API_URL` or `NEXT_PUBLIC_API_URL` if the backend runs elsewhere.
+
+To run the backend tests:
+
+```bash
+cd backend
+python -m pytest -q
+```
+
+Optional infrastructure services can be started with `docker compose up --build` from this directory. Copy `backend/.env.example` to `backend/.env` first if using the compose backend service.
+
+## Vercel deployment
+
+The production frontend is available at [frontend-topaz-xi-ce26ca02l0.vercel.app](https://frontend-topaz-xi-ce26ca02l0.vercel.app), and its FastAPI backend is deployed at [resumeproject-liard.vercel.app](https://resumeproject-liard.vercel.app). The frontend's production `API_URL` points to that backend.
+
+Both are separate Vercel projects in this monorepo. The frontend project root is `frontend/`; the backend project root is `conversational-shopping-concierge/backend/`. The backend's `vercel.json` routes requests through the FastAPI app. After linking the appropriate Vercel project, deploy from the matching directory/project root with `vercel --prod`. Keep the frontend's production `API_URL` set to the public backend URL.
 
 ## API
 
-The backend exposes endpoints such as:
+The backend exposes:
 
 - POST /api/chat
 - POST /api/agent/run
 - GET /api/health
+- GET /api/products
 - GET /api/workflows/{workflow_id}
 - POST /api/approval/{workflow_id}
 
 ## Notes
 
-This scaffold includes a working local implementation with mock product data and in-memory workflow orchestration that can later be connected to real PostgreSQL, Redis, OpenAI, and ChromaDB deployments.
+This project uses sample product data and in-memory workflow orchestration. PostgreSQL, Redis, OpenAI, and ChromaDB integrations are optional infrastructure and are not required for the local catalog, cart, or demo chat flow.

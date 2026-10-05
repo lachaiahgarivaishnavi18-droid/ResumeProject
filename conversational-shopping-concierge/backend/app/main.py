@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
+from app.data.products import PRODUCTS
 from app.graph.workflow import build_workflow
 from app.models.schemas import ChatRequest, ChatResponse, HumanApprovalRequest
 
@@ -85,11 +86,7 @@ def ingest_documents() -> dict[str, Any]:
 
 @app.get("/api/products")
 def products() -> list[dict[str, Any]]:
-    return [{"product_id": p["product_id"], "name": p["name"], "price": p["price"]} for p in [
-        {"product_id": "LAP001", "name": "AeroPro G14", "price": 74999},
-        {"product_id": "PHN001", "name": "PixelLens M9", "price": 33999},
-        {"product_id": "MON001", "name": "VisionMax 27U", "price": 24999},
-    ]]
+    return PRODUCTS
 
 
 if __name__ == "__main__":
