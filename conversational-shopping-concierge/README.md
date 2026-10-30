@@ -102,6 +102,12 @@ The backend exposes:
 - GET /api/workflows/{workflow_id}
 - POST /api/approval/{workflow_id}
 
+## Observability dashboard
+
+The application includes a SQLite-backed observability layer for logs, metrics, traces, and drift monitoring. The backend exposes `/api/observability/overview`, `/api/logs`, `/api/metrics/*`, `/api/traces`, `/api/drift`, and related event endpoints, with demo data automatically seeded in `backend/observability.db`.
+
+The frontend also includes dashboard routes for `/logs`, `/metrics`, `/traces`, and `/drift` so you can inspect application behavior and correlated requests from the UI.
+
 ## Notes
 
 This project uses sample product data and in-memory workflow orchestration. PostgreSQL, Redis, OpenAI, and ChromaDB integrations are optional infrastructure and are not required for the local catalog, cart, or demo chat flow.
